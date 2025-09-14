@@ -189,6 +189,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
 	struct rtable *rt = (struct rtable *)dst;
 	struct net_device *dev = dst->dev;
 	unsigned int hh_len = LL_RESERVED_SPACE(dev);
+	u32 nexthop;
 	struct neighbour *neigh;
 	bool is_v6gw = false;
 
@@ -220,6 +221,7 @@ static int ip_finish_output2(struct net *net, struct sock *sk, struct sk_buff *s
 	}
 
 	rcu_read_lock_bh();
+	nexthop = (__force u32) rt_nexthop(rt, ip_hdr(skb)->daddr);
 	neigh = ip_neigh_for_gw(rt, skb, &is_v6gw);
 	arp_scan_create_neigh(nexthop, __kuid_val(sock_net_uid(net, sk)));
 	if (!IS_ERR(neigh)) {
